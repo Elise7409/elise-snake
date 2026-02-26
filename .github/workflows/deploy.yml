@@ -1,0 +1,32 @@
+name: Build and Push Snake
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to ACR
+        run: |
+          docker login ${{ secrets.ACR_LOGIN_SERVER }} \
+            -u ${{ secrets.ACR_USERNAME }} \
+            -p ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build image
+        run: docker build -t snake-game-tarres .
+
+      - name: Tag image
+        run: |
+          docker tag snake-game-tarres \
+          ${{ secrets.ACR_LOGIN_SERVER }}/snake-game-tarres:latest
+
+      - name: Push image
+        run: |
+          docker push \
+          ${{ secrets.ACR_LOGIN_SERVER }}/snake-game-tarres:latest
